@@ -1,0 +1,19 @@
+# Byet Host / Shared Hosting Root .htaccess (Single-Folder Deployment)
+# Place this file as `.htaccess` inside your `htdocs/` root directory if you upload the entire project into `htdocs/`.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1. Protect sensitive files (.env, composer, artisan, git, storage logs)
+    RewriteRule ^(\.env|\.git|composer\.(json|lock)|package(-lock)?\.json|artisan|phpunit\.xml) - [F,L,NC]
+    RewriteRule ^storage/logs/.* - [F,L,NC]
+
+    # 2. Prevent missing static assets from booting Laravel and exhausting PHP processes
+    RewriteCond %{REQUEST_URI} \.(css|js|png|jpe?g|gif|ico|svg|webp|woff2?|ttf|eot|map)$ [NC]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ - [R=404,L]
+
+    # 3. Forward all incoming web requests to the public/ folder safely
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
